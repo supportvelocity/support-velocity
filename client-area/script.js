@@ -1,25 +1,13 @@
 /**
  * TechGrid Systems - Customer Portal Logic
- * Contains SHA-256 hashing and validation
+ * Native plain-text validation
  */
 
-// Passwords stored as SHA-256 hashes
-const credentials = {
-    "Admin": "3b612c75a7b5048a435fb6ec81e52ff92d6d795a8b5a9c17070f6a63c97a53b2",
-    "test": "1b3152528784d7a8d052d9a3b2b48d28a506841280b85295d85834907996c56d"
-};
+// Native username and password arrays
+const usernameArray = ["Admin", "test"];
+const passwordArray = ["Admin123", "test1"];
 
 let count = 2; // Initial attempts
-
-/**
- * Generate SHA-256 hex string from message
- */
-async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 /**
  * Display messages in the UI box
@@ -39,9 +27,9 @@ function showMessage(text, isError = true) {
 }
 
 /**
- * Main validation function
+ * Main validation function using native arrays
  */
-async function validate() {
+function validate() {
     const unField = document.getElementById('username');
     const pwField = document.getElementById('password');
     const btn = document.getElementById('login-btn');
@@ -54,13 +42,20 @@ async function validate() {
         return;
     }
 
-    // Hash input to compare
-    const hashedInputPw = await sha256(pw);
+    let valid = false;
 
-    if (credentials[un] === hashedInputPw) {
+    // Standard loop validation for plain-text credentials
+    for (let i = 0; i < usernameArray.length; i++) {
+        if ((un === usernameArray[i]) && (pw === passwordArray[i])) {
+            valid = true;
+            break;
+        }
+    }
+
+    if (valid) {
         showMessage("Login successful! Redirecting...", false);
         setTimeout(() => {
-            window.location = "https://techgrid-systems.github.io/techgrid-systems/support/";
+            window.location = "https://cyberconnectit.github.io/main-website/Portal/PartnerHome/";
         }, 800);
         return;
     }
@@ -80,7 +75,7 @@ async function validate() {
     }
 }
 
-// Basic security measures
+// Basic security measures to prevent back navigation
 function preback() { window.history.forward(); }
 setTimeout(preback, 0);
 window.onunload = function() { null };
