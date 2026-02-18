@@ -14,27 +14,9 @@
             background-color: #030712;
             color: #ffffff;
             margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
-        }
-
-        .security-scan {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, #ef4444, transparent);
-            animation: scan 3s linear infinite;
-            z-index: 5;
-        }
-
-        @keyframes scan {
-            0% { top: 0%; }
-            100% { top: 100%; }
+            display: flex;
+            flex-direction: column;
         }
 
         .grid-background {
@@ -55,13 +37,16 @@
             background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
             filter: blur(60px);
             border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 0;
             animation: pulse 4s infinite alternate;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.3; }
-            100% { transform: scale(1.2); opacity: 0.6; }
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
         }
 
         .security-box {
@@ -137,46 +122,61 @@
 </head>
 <body>
 
-    <div class="security-scan"></div>
-    <div class="grid-background"></div>
-    <div class="alert-glow"></div>
+    <!-- Standard Header -->
+    <header class="relative z-50 w-full bg-white border-b border-slate-200">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <span class="text-xl italic font-black tracking-tighter text-slate-900 uppercase">
+                        TECHGRID <span class="text-blue-600">SYSTEMS</span>
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="https://techgrid-systems.github.io/techgrid-systems/" class="text-sm font-bold text-slate-600 hover:text-blue-600 transition uppercase tracking-wider">Home</a>
+                    <button class="bg-blue-600 text-white px-6 py-2.5 rounded-md text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition">
+                        System Status
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-    <div class="security-box">
-        <div class="mb-4">
-            <span class="text-sm italic font-black tracking-tighter text-slate-400 uppercase">
-                TECHGRID<span class="text-red-500">SYSTEMS</span> SECURITY
-            </span>
-        </div>
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center relative overflow-hidden">
+        <div class="grid-background"></div>
+        <div class="alert-glow"></div>
 
-        <div class="icon-shield">
-            <i class="fas fa-shield-alt"></i>
-        </div>
+        <div class="security-box">
+            <div class="icon-shield">
+                <i class="fas fa-shield-alt"></i>
+            </div>
 
-        <div class="status-badge">Access Denied</div>
+            <div class="status-badge">Access Denied</div>
 
-        <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-4">
-            Unauthorised Request
-        </h1>
-        
-        <p class="text-slate-400 font-medium leading-relaxed mb-8 text-sm">
-            Your current account credentials do not have the required permissions to access this directory. If you believe this is an error, please contact your system administrator.
-        </p>
-
-        <div class="space-y-3">
-            <a href="login.html" class="btn-action btn-primary">
-                Return to Login
-            </a>
-            <a href="https://techgrid-systems.github.io/techgrid-systems/support/" class="btn-action btn-outline">
-                Contact Helpdesk
-            </a>
-        </div>
-
-        <div class="mt-8 pt-6 border-t border-slate-800">
-            <p class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
-                Error Code: 403_FORBIDDEN_ENTRY
+            <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-4">
+                Unauthorised Request
+            </h1>
+            
+            <p class="text-slate-400 font-medium leading-relaxed mb-8 text-sm">
+                Your current account credentials do not have the required permissions to access this directory. If you believe this is an error, please contact your system administrator.
             </p>
+
+            <div class="space-y-3 text-center">
+                <a href="login.html" class="btn-action btn-primary">
+                    Return to Login
+                </a>
+                <a href="https://techgrid-systems.github.io/techgrid-systems/support/" class="btn-action btn-outline">
+                    Contact Helpdesk
+                </a>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-slate-800">
+                <p class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
+                    Error Code: 403_FORBIDDEN_ENTRY
+                </p>
+            </div>
         </div>
-    </div>
+    </main>
 
 </body>
 </html>
