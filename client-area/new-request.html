@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Request | TechGrid Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        
+        .type-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .type-card:hover {
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .type-card.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
+        }
+
+        #form-container { display: none; }
+        .form-section { display: none; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-[#1e293b] text-white px-6 md:px-12 h-16 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center space-x-10">
+            <div class="flex flex-col leading-none cursor-pointer" onclick="navigateTo('dashboard.html')">
+                <span class="text-xl font-bold tracking-tight">TechGrid</span>
+                <span class="text-[10px] tracking-[0.3em] uppercase opacity-70">Systems</span>
+            </div>
+            <nav class="hidden lg:flex items-center space-x-6 text-xs uppercase tracking-widest font-medium opacity-80 h-full">
+                <a href="javascript:void(0)" onclick="navigateTo('dashboard.html')" class="h-16 flex items-center px-2">Home</a>
+                <a href="javascript:void(0)" onclick="navigateTo('new-request.html')" class="h-16 flex items-center px-2 border-b-2 border-blue-400 text-blue-400">New Request</a>
+                <a href="javascript:void(0)" onclick="navigateTo('history.html')" class="h-16 flex items-center px-2">My History</a>
+            </nav>
+        </div>
+        <div id="user-pill" class="flex items-center text-[10px] bg-slate-800/50 border border-slate-700 px-3 py-1.5 rounded-full text-slate-300 font-bold tracking-wider">
+            <i class="fas fa-user-circle mr-2 text-blue-400"></i>
+            <span id="user-display-name">LOADING...</span>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto w-full p-8 md:p-12">
+        <div class="mb-12">
+            <h1 class="text-3xl font-black text-slate-900 mb-2">Submit a Request</h1>
+            <p class="text-slate-500">Please select the type of assistance you require today.</p>
+        </div>
+
+        <!-- STEP 1: SELECT TYPE -->
+        <div id="selection-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+            <div onclick="showForm('tech')" class="type-card bg-white p-6 rounded-xl border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800">Technical Support</h3>
+                    <p class="text-xs text-slate-500">Hardware, software, or network issues.</p>
+                </div>
+            </div>
+
+            <div onclick="showForm('account')" class="type-card bg-white p-6 rounded-xl border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800">New Account/Access</h3>
+                    <p class="text-xs text-slate-500">Onboarding or permission changes.</p>
+                </div>
+            </div>
+
+            <div onclick="showForm('billing')" class="type-card bg-white p-6 rounded-xl border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800">Billing Inquiry</h3>
+                    <p class="text-xs text-slate-500">Invoices, payments, or plan changes.</p>
+                </div>
+            </div>
+
+            <div onclick="showForm('feedback')" class="type-card bg-white p-6 rounded-xl border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-xl">
+                    <i class="fas fa-comment-alt"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800">General/Feedback</h3>
+                    <p class="text-xs text-slate-500">Suggestions or general questions.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: DYNAMIC FORM -->
+        <div id="form-container" class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="bg-slate-50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
+                <span id="selected-type-label" class="text-[10px] font-black uppercase tracking-widest text-blue-600">Technical Support</span>
+                <button onclick="resetSelection()" class="text-xs font-bold text-slate-400 hover:text-slate-600">Change Type</button>
+            </div>
+            
+            <form id="request-form" class="p-8 space-y-6">
+                <!-- COMMON FIELDS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Subject</label>
+                        <input type="text" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Urgency</label>
+                        <select class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                            <option>Low</option>
+                            <option>Medium</option>
+                            <option>High - Business Impeding</option>
+                            <option>Critical - System Down</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC DESCRIPTION LABEL -->
+                <div>
+                    <label id="desc-label" class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Detailed Description</label>
+                    <textarea rows="5" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Please provide as much detail as possible..."></textarea>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full md:w-auto px-12 py-4 bg-blue-600 text-white font-black uppercase tracking-widest rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                        Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function navigateTo(page) {
+            const user = localStorage.getItem('techgrid_user');
+            window.location.href = user ? `${page}?username=${encodeURIComponent(user)}` : page;
+        }
+
+        function verifySession() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentUser = urlParams.get('username') || localStorage.getItem('techgrid_user');
+
+            if (currentUser && currentUser !== "null") {
+                const cleanName = decodeURIComponent(currentUser).replace(/['"]+/g, '');
+                localStorage.setItem('techgrid_user', cleanName);
+                document.getElementById('user-display-name').innerText = cleanName.toUpperCase();
+            } else {
+                window.location.href = "login.html";
+            }
+        }
+
+        function showForm(type) {
+            const grid = document.getElementById('selection-grid');
+            const container = document.getElementById('form-container');
+            const label = document.getElementById('selected-type-label');
+            const descLabel = document.getElementById('desc-label');
+
+            grid.style.display = 'none';
+            container.style.display = 'block';
+
+            switch(type) {
+                case 'tech':
+                    label.innerText = "Technical Support Request";
+                    descLabel.innerText = "Issue Details & Steps to Reproduce";
+                    break;
+                case 'account':
+                    label.innerText = "Account / Access Request";
+                    descLabel.innerText = "User details and required permissions";
+                    break;
+                case 'billing':
+                    label.innerText = "Billing Inquiry";
+                    descLabel.innerText = "Invoice number and query details";
+                    break;
+                case 'feedback':
+                    label.innerText = "General Feedback";
+                    descLabel.innerText = "Your comments or suggestions";
+                    break;
+            }
+        }
+
+        function resetSelection() {
+            document.getElementById('selection-grid').style.display = 'grid';
+            document.getElementById('form-container').style.display = 'none';
+        }
+
+        document.getElementById('request-form').onsubmit = function(e) {
+            e.preventDefault();
+            alert("Request submitted successfully! Redirecting to dashboard...");
+            navigateTo('dashboard.html');
+        };
+
+        window.onload = verifySession;
+    </script>
+</body>
+</html>
