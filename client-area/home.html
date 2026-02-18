@@ -25,8 +25,6 @@
             border: 1px solid #e2e8f0;
             transition: all 0.2s ease;
             cursor: pointer;
-            text-decoration: none;
-            color: inherit;
         }
         
         .service-card:hover {
@@ -52,6 +50,17 @@
             justify-content: center;
             z-index: 100;
         }
+
+        /* Search Results Styling */
+        #search-results {
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .search-item:hover {
+            background-color: #f1f5f9;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -68,7 +77,7 @@
         <!-- TOP HEADER -->
         <header class="bg-[#1e293b] text-white px-6 md:px-12 h-16 flex items-center justify-between shrink-0 sticky top-0 z-50">
             <div class="flex items-center space-x-10">
-                <div class="flex flex-col leading-none cursor-pointer" onclick="navigateTo('dashboard.html')">
+                <div onclick="navigateTo('dashboard.html')" class="flex flex-col leading-none cursor-pointer">
                     <span class="text-xl font-bold tracking-tight">TechGrid</span>
                     <span class="text-[10px] tracking-[0.3em] uppercase opacity-70">Systems</span>
                 </div>
@@ -91,66 +100,116 @@
             </div>
         </header>
 
-        <!-- HERO SECTION -->
-        <section class="hero-bg h-64 flex flex-col items-center justify-center text-white px-6">
+        <!-- HERO SECTION WITH GLOBAL SEARCH -->
+        <section class="hero-bg h-80 flex flex-col items-center justify-center text-white px-6 relative">
             <h1 class="text-3xl font-light mb-8" id="hero-welcome">Welcome back</h1>
-            <div class="relative w-full max-w-4xl">
+            
+            <div class="relative w-full max-w-2xl z-40">
                 <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" placeholder="Search for services or solutions..." class="w-full py-5 pl-14 pr-6 rounded-md text-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-500/30 shadow-2xl text-lg">
+                <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Search forms, history, or services (e.g. 'billing', 'vpn')..." class="w-full py-5 pl-14 pr-6 rounded-t-lg text-slate-800 focus:outline-none shadow-2xl text-lg">
+                
+                <!-- Search Results Overlay -->
+                <div id="search-results" class="absolute top-full left-0 w-full bg-white rounded-b-lg border-x border-b border-slate-200 shadow-2xl">
+                    <div id="results-list" class="p-2">
+                        <!-- Items injected here -->
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- DASHBOARD GRID -->
         <main class="max-w-7xl mx-auto w-full p-8 md:p-12">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- IT Support / New Request -->
-                <a href="javascript:void(0)" onclick="navigateTo('new-request.html')" class="service-card p-10 flex flex-col items-center text-center">
+                <div onclick="navigateTo('new-request.html')" class="service-card p-10 flex flex-col items-center text-center">
                     <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-ticket-alt"></i></div>
                     <h3 class="font-bold text-slate-800 mb-2">IT Support</h3>
                     <p class="text-xs text-slate-400">Request hardware or software assistance.</p>
-                </a>
-
-                <!-- Knowledge Base -->
-                <a href="javascript:void(0)" onclick="navigateTo('knowledge-base.html')" class="service-card p-10 flex flex-col items-center text-center">
+                </div>
+                <div class="service-card p-10 flex flex-col items-center text-center">
                     <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-book-open"></i></div>
                     <h3 class="font-bold text-slate-800 mb-2">Knowledge Base</h3>
                     <p class="text-xs text-slate-400">Help articles and documentation.</p>
-                </a>
-
-                <!-- Scheduling -->
-                <a href="javascript:void(0)" onclick="navigateTo('scheduling.html')" class="service-card p-10 flex flex-col items-center text-center">
+                </div>
+                <div class="service-card p-10 flex flex-col items-center text-center">
                     <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-calendar-alt"></i></div>
                     <h3 class="font-bold text-slate-800 mb-2">Scheduling</h3>
                     <p class="text-xs text-slate-400">Book a session with a technician.</p>
-                </a>
-
-                <!-- Billing -->
-                <a href="javascript:void(0)" onclick="navigateTo('billing.html')" class="service-card p-10 flex flex-col items-center text-center">
+                </div>
+                <div onclick="navigateTo('new-request.html')" class="service-card p-10 flex flex-col items-center text-center">
                     <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-file-invoice-dollar"></i></div>
                     <h3 class="font-bold text-slate-800 mb-2">Billing</h3>
                     <p class="text-xs text-slate-400">Manage invoices and payments.</p>
-                </a>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        /**
-         * Navigation Helper
-         * Appends the current username to any internal link to maintain session
-         */
-        function navigateTo(page) {
-            const user = localStorage.getItem('techgrid_user');
-            if (user) {
-                window.location.href = `${page}?username=${encodeURIComponent(user)}`;
+        // Global Data Index for Search
+        const searchIndex = [
+            { title: "Technical Support Form", category: "Form", icon: "fa-tools", url: "new-request.html", keywords: "help hardware software support ticket broken" },
+            { title: "Billing Inquiry Form", category: "Form", icon: "fa-file-invoice-dollar", url: "new-request.html", keywords: "invoice money payment bill pricing" },
+            { title: "New Account Request", category: "Form", icon: "fa-user-plus", url: "new-request.html", keywords: "onboarding access user login permission" },
+            { title: "General Feedback", category: "Form", icon: "fa-comment-alt", url: "new-request.html", keywords: "suggestion complaint review" },
+            { title: "Request History", category: "Page", icon: "fa-history", url: "history.html", keywords: "previous past tickets status resolved" },
+            { title: "VPN Connection Issues (#TG-88210)", category: "History", icon: "fa-shield-alt", url: "history.html", keywords: "vpn network remote london" },
+            { title: "Knowledge Base", category: "Resource", icon: "fa-book-open", url: "#", keywords: "help docs manuals guides instructions" },
+            { title: "VOIP Portal", category: "Resource", icon: "fa-phone", url: "support_page.html", keywords: "phone call voice setup" }
+        ];
+
+        function handleSearch(query) {
+            const resultsDiv = document.getElementById('search-results');
+            const listDiv = document.getElementById('results-list');
+            const searchInput = document.getElementById('global-search');
+            
+            if (!query.trim()) {
+                resultsDiv.style.display = 'none';
+                searchInput.classList.remove('rounded-t-lg');
+                searchInput.classList.add('rounded-lg');
+                return;
+            }
+
+            const filtered = searchIndex.filter(item => 
+                item.title.toLowerCase().includes(query.toLowerCase()) || 
+                item.keywords.toLowerCase().includes(query.toLowerCase()) ||
+                item.category.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length > 0) {
+                listDiv.innerHTML = filtered.map(item => `
+                    <div onclick="navigateTo('${item.url}')" class="search-item flex items-center p-3 rounded-lg cursor-pointer transition-colors border-b border-slate-50 last:border-0">
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded flex items-center justify-center mr-4">
+                            <i class="fas ${item.icon}"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="text-sm font-bold text-slate-800">${item.title}</div>
+                            <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest">${item.category}</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                    </div>
+                `).join('');
+                resultsDiv.style.display = 'block';
+                searchInput.classList.add('rounded-t-lg');
+                searchInput.classList.remove('rounded-lg');
             } else {
-                window.location.href = page;
+                listDiv.innerHTML = `<div class="p-4 text-center text-slate-400 text-sm italic">No results found for "${query}"</div>`;
+                resultsDiv.style.display = 'block';
             }
         }
 
-        /**
-         * Session Verification Logic
-         */
+        // Close search when clicking outside
+        document.addEventListener('click', (e) => {
+            const searchContainer = document.querySelector('.relative.w-full.max-w-2xl');
+            if (!searchContainer.contains(e.target)) {
+                document.getElementById('search-results').style.display = 'none';
+            }
+        });
+
+        function navigateTo(page) {
+            const user = localStorage.getItem('techgrid_user');
+            window.location.href = user ? `${page}?username=${encodeURIComponent(user)}` : page;
+        }
+
         function verifySession() {
             const urlParams = new URLSearchParams(window.location.search);
             let currentUser = urlParams.get('username') || localStorage.getItem('techgrid_user');
@@ -158,7 +217,6 @@
             if (currentUser && currentUser !== "null" && currentUser !== "") {
                 const cleanName = decodeURIComponent(currentUser).replace(/['"]+/g, '');
                 localStorage.setItem('techgrid_user', cleanName);
-                
                 document.getElementById('user-display-name').innerText = cleanName.toUpperCase();
                 document.getElementById('hero-welcome').innerText = `Welcome back, ${cleanName}`;
                 
