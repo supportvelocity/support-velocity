@@ -55,7 +55,7 @@ function validate() {
     if (valid) {
         showMessage("Login successful! Redirecting...", false);
         setTimeout(() => {
-            window.location = "https://techgrid-systems.github.io/techgrid-systems/client-area/home/";
+            window.location = "https://techgrid-systems.github.io/techgrid-systems/client-area/home";
         }, 800);
         return;
     }
